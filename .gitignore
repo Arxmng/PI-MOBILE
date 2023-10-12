@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native files
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro bundler
+.metro-health-check*
+
+# Debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS files
+.DS_Store
+
+# Windows files
+*.dll
+*.exe
+*.lnk
+Thumbs.db
+
+# Linux files
+*.swp
+*.swo
+
+# Local environment files
+.env*.local
+
+# TypeScript build output
+*.tsbuildinfo
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+
+# Build directory
+build/
+out/
+
+# TypeScript cache
+.tscache/
+
+# Jest test coverage
+coverage/
+
+# VS Code settings
+.vscode/
+
+# JetBrains IDE settings
+.idea/
+
+# General environment config
+.env
+
+# Firebase cache
+.firebase/
+
+#Firebase
+#config/firebaseConfig.js
+
+# Security keys
+*.pem
+*.cer
+*.crt
