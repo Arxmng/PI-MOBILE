@@ -79,7 +79,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
             {successMessage && <Text style={{ color: 'green' }}>{successMessage}</Text>}
             {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
             <Button title="Entrar" onPress={() => formik.handleSubmit()} />
-            <Button title="Esqueceu a senha?" type="clear" onPress={() => navigation.navigate('ForgotPassword')} />
+            
             <Button title="Cadastrar" type="clear" onPress={() => navigation.navigate('SignUp')} />
 
             {/* Linha e palavra "ou" */}
