@@ -1,11 +1,9 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, ScrollView, Text} from 'react-native';
 import {Input, Button} from 'react-native-elements';
-import { useFormik, Formik, Form, Field } from 'formik';
+import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import {createUserWithEmailAndPassword} from 'firebase/auth';
-import { auth, db } from '../config/firebaseConfig';
-import {Picker} from '@react-native-picker/picker';
+import { db } from '../config/firebaseConfig';
 import RNPickerSelect from 'react-native-picker-select';
 import { addDoc, collection } from "firebase/firestore";
 
@@ -38,15 +36,6 @@ const styles = StyleSheet.create({
     halfWidth: {
         width: '48%',
     },
-    PickerContainer: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        height: 50,
-        justifyContent: 'center',
-        paddingLeft: 10,
-        width: '48%',
-    }
 });
 
 const pickerSelectStyles = StyleSheet.create({
