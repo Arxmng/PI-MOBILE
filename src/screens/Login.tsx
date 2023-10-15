@@ -9,7 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '../config/firebaseConfig';
 
-
 type Props = {
     navigation: any;
 };
@@ -20,8 +19,8 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
     const [loaded, setLoaded] = useState(false);
 
-
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const formik = useFormik({
         initialValues: { email: '', password: '' },
@@ -29,11 +28,14 @@ const Login: React.FC<Props> = ({ navigation }) => {
             email: Yup.string().email('Invalid email address').required('Required'),
             password: Yup.string().required('Required'),
         }),
-        onSubmit: async (values) => {
+        onSubmit: async (values: { email: string; password: string; }) => {
             try {
                 await signInWithEmailAndPassword(auth, values.email, values.password);
+                setSuccessMessage('Login bem-sucedido!');
+                setErrorMessage(null);
             } catch (error) {
                 setErrorMessage((error as any).message);
+                setSuccessMessage(null);
             }
         },
     });
@@ -60,7 +62,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
     return (
         <View style={[styles.container, isDarkMode ? styles.darkMode : styles.lightMode]}>
-        <Image source={require('./../../assets/images/splash.png')} style={styles.logo} />
+            <Image source={require('./../../assets/images/splash.png')} style={styles.logo} />
             <Input
                 placeholder='E-mail'
                 onChangeText={formik.handleChange('email')}
@@ -74,6 +76,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
                 value={formik.values.password}
                 errorMessage={formik.touched.password && formik.errors.password ? formik.errors.password : ''}
             />
+            {successMessage && <Text style={{ color: 'green' }}>{successMessage}</Text>}
             {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
             <Button title="Entrar" onPress={() => formik.handleSubmit()} />
             
@@ -100,7 +103,6 @@ const DividerWithText = () => {
         </View>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: {
@@ -134,6 +136,5 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 });
-
 
 export default Login;
