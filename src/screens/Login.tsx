@@ -61,7 +61,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
     return (
         <View style={[styles.container, isDarkMode ? styles.darkMode : styles.lightMode]}>
-            <Image source={require('./../../assets/images/splash.png')} style={styles.logo} />
+            <Image source={require('./../../assets/images/Studio-Games.jpg')} style={styles.logo} />
             <Input
                 placeholder='E-mail'
                 onChangeText={formik.handleChange('email')}
@@ -86,7 +86,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
             <Button
                 title="Entrar com Google"
-                icon={<Image source={require('./../../assets/images/splash.png')} style={{ width: 24, height: 24, marginRight: 10 }} />}
+                icon={<Image source={require('./../../assets/images/googleLogo.png')} style={{ width: 24, height: 24, marginRight: 10 }} />}
                 onPress={() => promptAsync()}
             />
         </View>
