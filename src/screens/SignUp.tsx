@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Input, Button } from 'react-native-elements';
+import React, {useState} from 'react';
+import {View, StyleSheet, ScrollView, Text} from 'react-native';
+import {Input, Button} from 'react-native-elements';
 import { useFormik, Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {createUserWithEmailAndPassword} from 'firebase/auth';
 import { auth, db } from '../config/firebaseConfig';
-import { Text } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { addDoc, collection } from "firebase/firestore"; 
+import {Picker} from '@react-native-picker/picker';
+import RNPickerSelect from 'react-native-picker-select';
+import { addDoc, collection } from "firebase/firestore";
 
 type Props = {
     navigation: any;
@@ -25,8 +25,56 @@ type FormValues = {
     howDidYouKnow: string;
 };
 
-const SignUp: React.FC<Props> = ({ navigation }) => {
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 20,
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    halfWidth: {
+        width: '48%',
+    },
+    PickerContainer: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        height: 50,
+        justifyContent: 'center',
+        paddingLeft: 10,
+        width: '48%',
+    }
+});
+
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: '#ccc', // Adjust this
+        borderRadius: 5, // Adjust this
+        color: 'black',
+    },
+    inputAndroid: {
+        fontSize: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 1,
+        borderColor: '#ccc', // Adjust this
+        borderRadius: 5, // Adjust this
+        color: 'black',
+    },
+});
+
+
+
+const SignUp: React.FC<Props> = ({navigation}) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [selectedState, setSelectedState] = useState<string | undefined>(undefined);
 
     const formik = useFormik({
         initialValues: {
@@ -64,134 +112,118 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
                     state: values.state,
                     howDidYouKnow: values.howDidYouKnow,
                 });
-              
+
                 console.log("Document written with ID: ", docRef.id);
-              } catch (e) {
+            } catch (e) {
                 console.error("Error adding document: ", e);
-              }
-            //navigation.navigate('Home')
+            }
         },
     });
 
+
     return (
-        <ScrollView>
-            <Input
-                placeholder='Nome Completo'
-                onChangeText={formik.handleChange('fullName')}
-                value={formik.values.fullName}
-                errorMessage={formik.touched.fullName && formik.errors.fullName ? formik.errors.fullName : ''}
-            />
-            <Input
-                placeholder='E-mail'
-                onChangeText={formik.handleChange('email')}
-                value={formik.values.email}
-                errorMessage={formik.touched.email && formik.errors.email ? formik.errors.email : ''}
-            />
-            <Input
-                placeholder='CPF'
-                onChangeText={formik.handleChange('cpf')}
-                value={formik.values.cpf}
-                errorMessage={formik.touched.cpf && formik.errors.cpf ? formik.errors.cpf : ''}
-            />
-            <Input placeholder={'Data de Nascimento'}
-                onChangeText={formik.handleChange('dateOfBirth')}
-                value={formik.values.dateOfBirth}
-                errorMessage={formik.touched.dateOfBirth && formik.errors.dateOfBirth ? formik.errors.dateOfBirth : ''}
-            />
-            <View style={styles.halfWidth}>
+        <ScrollView style={{flex: 1}}>
+            <View style={styles.container}>
                 <Input
-                    placeholder='Telefone'
-                    onChangeText={formik.handleChange('phone')}
-                    value={formik.values.phone}
-                    errorMessage={formik.touched.phone && formik.errors.phone ? formik.errors.phone : ''}
+                    placeholder='Nome Completo'
+                    onChangeText={formik.handleChange('fullName')}
+                    value={formik.values.fullName}
+                    errorMessage={formik.touched.fullName && formik.errors.fullName ? formik.errors.fullName : ''}
                 />
-            </View>
-            <View style={styles.halfWidth}>
                 <Input
-                    placeholder='Telefone do Responsável'
-                    onChangeText={formik.handleChange('responsiblePhone')}
-                    value={formik.values.responsiblePhone}
-                    errorMessage={formik.touched.responsiblePhone && formik.errors.responsiblePhone ? formik.errors.responsiblePhone : ''}
+                    placeholder='E-mail'
+                    onChangeText={formik.handleChange('email')}
+                    value={formik.values.email}
+                    errorMessage={formik.touched.email && formik.errors.email ? formik.errors.email : ''}
                 />
-            </View>
-            <View style={styles.leftHalf}>
                 <Input
-                    placeholder='Cidade'
-                    onChangeText={formik.handleChange('city')}
-                    value={formik.values.city}
-                    errorMessage={formik.touched.city && formik.errors.city ? formik.errors.city : ''}
+                    placeholder='CPF'
+                    onChangeText={formik.handleChange('cpf')}
+                    value={formik.values.cpf}
+                    errorMessage={formik.touched.cpf && formik.errors.cpf ? formik.errors.cpf : ''}
                 />
+                <Input placeholder={'Data de Nascimento'}
+                       onChangeText={formik.handleChange('dateOfBirth')}
+                       value={formik.values.dateOfBirth}
+                       errorMessage={formik.touched.dateOfBirth && formik.errors.dateOfBirth ? formik.errors.dateOfBirth : ''}
+                />
+                <View style={styles.row}>
+                    <Input
+                        containerStyle={styles.halfWidth}
+                        placeholder='Telefone'
+                        onChangeText={formik.handleChange('phone')}
+                        value={formik.values.phone}
+                        errorMessage={formik.touched.phone && formik.errors.phone ? formik.errors.phone : ''}
+                    />
+                    <Input
+                        containerStyle={styles.halfWidth}
+                        placeholder='Telefone do Responsável'
+                        onChangeText={formik.handleChange('responsiblePhone')}
+                        value={formik.values.responsiblePhone}
+                        errorMessage={formik.touched.responsiblePhone && formik.errors.responsiblePhone ? formik.errors.responsiblePhone : ''}
+                    />
+                </View>
+
+                <View style={styles.row}>
+                    <View style={styles.halfWidth}>
+                        <RNPickerSelect
+                            onValueChange={(value) => {
+                                setSelectedState(value);
+                                formik.setFieldValue('state', value);
+                            }}
+                            items={[
+                                {label: 'SP', value: 'SP'},
+                                {label: 'RJ', value: 'RJ'},
+                                {label: 'MG', value: 'MG'},
+                                {label: 'ES', value: 'ES'},
+                                {label: 'RS', value: 'RS'},
+                                {label: 'SC', value: 'SC'},
+                                {label: 'PR', value: 'PR'},
+                                {label: 'MS', value: 'MS'},
+                                {label: 'MT', value: 'MT'},
+                                {label: 'GO', value: 'GO'},
+                                {label: 'DF', value: 'DF'},
+                                {label: 'BA', value: 'BA'},
+                                {label: 'SE', value: 'SE'},
+                                {label: 'AL', value: 'AL'},
+                                {label: 'PE', value: 'PE'},
+                                {label: 'PB', value: 'PB'},
+                                {label: 'RN', value: 'RN'},
+                                {label: 'CE', value: 'CE'},
+                                {label: 'PI', value: 'PI'},
+                                {label: 'MA', value: 'MA'},
+                                {label: 'PA', value: 'PA'},
+                                {label: 'AP', value: 'AP'},
+                                {label: 'AM', value: 'AM'},
+                                {label: 'RR', value: 'RR'},
+                                {label: 'AC', value: 'AC'},
+                                {label: 'RO', value: 'RO'},
+                                {label: 'TO', value: 'TO'},
+                            ]}
+                            style={pickerSelectStyles}
+                        />
+                    </View>
+                    <Input
+                        containerStyle={styles.halfWidth}
+                        placeholder='Cidade'
+                        onChangeText={formik.handleChange('city')}
+                        value={formik.values.city}
+                        errorMessage={formik.touched.city && formik.errors.city ? formik.errors.city : ''}
+                    />
+                </View>
+
+                <Input placeholder={'Como nos conheceu?'}
+                       onChangeText={formik.handleChange('howDidYouKnow')}
+                       value={formik.values.howDidYouKnow}
+                       errorMessage={formik.touched.howDidYouKnow && formik.errors.howDidYouKnow ? formik.errors.howDidYouKnow : ''}
+                />
+                {errorMessage && <Text style={{color: 'red'}}>{errorMessage}</Text>}
+                <Button title="Registrar" onPress={() => formik.handleSubmit()}/>
+                <Button title="Voltar para Login" type="clear"
+                        onPress={() => navigation.navigate('Login')}/>
             </View>
-            <View style={styles.rightHalf}>
-                <Picker
-                    selectedValue={formik.values.state}
-                    onValueChange={(itemValue: string | number) =>
-                        formik.setFieldValue('state', itemValue)
-                    }
-                >
-                    <Picker.Item label="SP" value="SP" />
-                    <Picker.Item label="RJ" value="RJ" />
-                    <Picker.Item label="MG" value="MG" />
-                    <Picker.Item label="ES" value="ES" />
-                    <Picker.Item label="RS" value="RS" />
-                    <Picker.Item label="SC" value="SC" />
-                    <Picker.Item label="PR" value="PR" />
-                    <Picker.Item label="MS" value="MS" />
-                    <Picker.Item label="MT" value="MT" />
-                    <Picker.Item label="GO" value="GO" />
-                    <Picker.Item label="DF" value="DF" />
-                    <Picker.Item label="AC" value="AC" />
-                    <Picker.Item label="AM" value="AM" />
-                    <Picker.Item label="RR" value="RR" />
-                    <Picker.Item label="PA" value="PA" />
-                    <Picker.Item label="AP" value="AP" />
-                    <Picker.Item label="TO" value="TO" />
-                    <Picker.Item label="RO" value="RO" />
-                    <Picker.Item label="BA" value="BA" />
-                    <Picker.Item label="SE" value="SE" />
-                    <Picker.Item label="AL" value="AL" />
-                    <Picker.Item label="PE" value="PE" />
-                    <Picker.Item label="PB" value="PB" />
-                    <Picker.Item label="RN" value="RN" />
-                    <Picker.Item label="CE" value="CE" />
-                    <Picker.Item label="PI" value="PI" />
-                    <Picker.Item label="MA" value="MA" />
-                </Picker>
-            </View>
-            <Input placeholder={'Como nos conheceu?'}
-                onChangeText={formik.handleChange('howDidYouKnow')}
-                value={formik.values.howDidYouKnow}
-                errorMessage={formik.touched.howDidYouKnow && formik.errors.howDidYouKnow ? formik.errors.howDidYouKnow : ''}
-            />
-            {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
-
-            <Button title="Registrar" onPress={() => formik.handleSubmit()} />
-
-            <Button title="Voltar para Login" type="clear" onPress={() => navigation.navigate('Login')} /> 
-
         </ScrollView>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 20,
-    },
-    halfWidth: {
-        width: '48%',
-        paddingRight: 5,
-    },
-    leftHalf: {
-        width: '48%',
-        paddingRight: 5,
-    },
-    rightHalf: {
-        width: '48%',
-        paddingLeft: 5,
-    }
-});
-
 export default SignUp;
-
