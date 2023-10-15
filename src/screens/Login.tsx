@@ -1,12 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Input, Button, Divider } from 'react-native-elements';
 import { useColorScheme } from 'react-native';
-import firebase from '../../config/firebaseConfig';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import * as Google from 'expo-auth-session/providers/google';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { auth } from '../../config/firebaseConfig';
 
 
 type Props = {
@@ -26,27 +27,27 @@ const Login: React.FC<Props> = ({ navigation }) => {
         initialValues: { email: '', password: '' },
         validationSchema: Yup.object({
             email: Yup.string().email('Invalid email address').required('Required'),
-            password: Yup.string().required('Required')
+            password: Yup.string().required('Required'),
         }),
         onSubmit: async (values) => {
             try {
-               // await firebase.auth().signInWithEmailAndPassword(values.email, values.password);
+                await signInWithEmailAndPassword(auth, values.email, values.password);
             } catch (error) {
                 setErrorMessage((error as any).message);
             }
         },
     });
 
+
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-        clientId: 'YOUR_WEB_CLIENT_ID',
+        clientId: '192591185329-bprc85sjtf2nf10jveo5fr3o1llhffrp.apps.googleusercontent.com',
     });
 
     React.useEffect(() => {
         if (response?.type === 'success') {
             const { id_token } = response.params;
-
-           // const credential = firebase.auth.GoogleAuthProvider.credential(id_token);
-           // firebase.auth().signInWithCredential(credential);
+            const credential = GoogleAuthProvider.credential(id_token);
+            signInWithCredential(auth, credential);
         }
     }, [response]);
 

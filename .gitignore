@@ -69,8 +69,8 @@ coverage/
 # Firebase cache
 .firebase/
 
-#Firebase
-#config/firebaseConfig.js
+#Firebase credentials
+config/firebaseConfig.js
 
 # Security keys
 *.pem
