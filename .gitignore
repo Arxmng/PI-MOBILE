@@ -70,7 +70,7 @@ coverage/
 .firebase/
 
 #Firebase credentials
-config/firebaseConfig.js
+src/config/firebaseCredentials.ts
 
 # Security keys
 *.pem

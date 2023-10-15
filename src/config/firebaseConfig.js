@@ -8,7 +8,13 @@ import { getAuth } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-//redacted
+    apiKey: "AIzaSyDQkw6h265xYltqqLYB-qXcheaMEXd1A54",
+    authDomain: "studiogamesapp.firebaseapp.com",
+    projectId: "studiogamesapp",
+    storageBucket: "studiogamesapp.appspot.com",
+    messagingSenderId: "192591185329",
+    appId: "1:192591185329:web:ad72c13e22388117992990",
+    measurementId: "G-NY1YTJKZTH"
 };
 
 // Initialize Firebase

@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import * as Google from 'expo-auth-session/providers/google';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { auth } from '../../config/firebaseConfig';
+import { auth } from '../config/firebaseConfig';
 
 
 type Props = {

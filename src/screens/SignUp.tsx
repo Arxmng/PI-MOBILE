@@ -4,7 +4,7 @@ import { Input, Button } from 'react-native-elements';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../config/firebaseConfig';
+import { auth } from '../config/firebaseConfig';
 import { Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
@@ -175,9 +175,17 @@ const styles = StyleSheet.create({
     },
     halfWidth: {
         width: '48%',
-        paddingRight: 2.5,
-        paddingLeft: 2.5,
+        paddingRight: 5,
     },
+    leftHalf: {
+        width: '48%',
+        paddingRight: 5,
+    },
+    rightHalf: {
+        width: '48%',
+        paddingLeft: 5,
+    }
 });
+
 
 export default SignUp;
