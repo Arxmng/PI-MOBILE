@@ -38,7 +38,6 @@ const Login: React.FC<Props> = ({ navigation }) => {
         },
     });
 
-
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
         clientId: '192591185329-bprc85sjtf2nf10jveo5fr3o1llhffrp.apps.googleusercontent.com',
     });
@@ -77,7 +76,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
             />
             {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
             <Button title="Entrar" onPress={() => formik.handleSubmit()} />
-            <Button title="Esqueceu a senha?" type="clear" onPress={() => navigation.navigate('ForgotPassword')} />
+            
             <Button title="Cadastrar" type="clear" onPress={() => navigation.navigate('SignUp')} />
 
             {/* Linha e palavra "ou" */}

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { Input, Button } from 'react-native-elements';
-import { useFormik } from 'formik';
+import { useFormik, Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebaseConfig';
+import { auth, db } from '../config/firebaseConfig';
 import { Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { addDoc, collection } from "firebase/firestore"; 
 
 type Props = {
     navigation: any;
@@ -22,7 +23,6 @@ type FormValues = {
     city: string;
     state: string;
     howDidYouKnow: string;
-    password: string;
 };
 
 const SignUp: React.FC<Props> = ({ navigation }) => {
@@ -32,7 +32,6 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
         initialValues: {
             fullName: '',
             email: '',
-            password: '',
             cpf: '',
             dateOfBirth: '',
             phone: '',
@@ -43,7 +42,6 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
         },
         validationSchema: Yup.object({
             email: Yup.string().email('Invalid email address').required('Required'),
-            password: Yup.string().required('Required'),
             fullName: Yup.string(),
             cpf: Yup.string(),
             dateOfBirth: Yup.string(),
@@ -55,16 +53,28 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
         }),
         onSubmit: async (values) => {
             try {
-                await createUserWithEmailAndPassword(auth, values.email, values.password);
-                // You can add logic here to save other form values to your database
-            } catch (error) {
-                setErrorMessage((error as any).message);
-            }
+                const docRef = await addDoc(collection(db, "studiogames"), {
+                    fullName: values.fullName,
+                    email: values.email,
+                    cpf: values.cpf,
+                    dateOfBirth: values.dateOfBirth,
+                    phone: values.phone,
+                    responsiblePhone: values.responsiblePhone,
+                    city: values.city,
+                    state: values.state,
+                    howDidYouKnow: values.howDidYouKnow,
+                });
+              
+                console.log("Document written with ID: ", docRef.id);
+              } catch (e) {
+                console.error("Error adding document: ", e);
+              }
+            //navigation.navigate('Home')
         },
     });
 
     return (
-        <View style={styles.container}>
+        <ScrollView>
             <Input
                 placeholder='Nome Completo'
                 onChangeText={formik.handleChange('fullName')}
@@ -76,13 +86,6 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
                 onChangeText={formik.handleChange('email')}
                 value={formik.values.email}
                 errorMessage={formik.touched.email && formik.errors.email ? formik.errors.email : ''}
-            />
-            <Input
-                placeholder='Senha'
-                secureTextEntry
-                onChangeText={formik.handleChange('password')}
-                value={formik.values.password}
-                errorMessage={formik.touched.password && formik.errors.password ? formik.errors.password : ''}
             />
             <Input
                 placeholder='CPF'
@@ -161,9 +164,12 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
                 errorMessage={formik.touched.howDidYouKnow && formik.errors.howDidYouKnow ? formik.errors.howDidYouKnow : ''}
             />
             {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
+
             <Button title="Registrar" onPress={() => formik.handleSubmit()} />
-            <Button title="Voltar para Login" type="clear" onPress={() => navigation.navigate('Login')} />
-        </View>
+
+            <Button title="Voltar para Login" type="clear" onPress={() => navigation.navigate('Login')} /> 
+
+        </ScrollView>
     );
 };
 
@@ -187,5 +193,5 @@ const styles = StyleSheet.create({
     }
 });
 
-
 export default SignUp;
+
