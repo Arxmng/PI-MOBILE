@@ -4,6 +4,8 @@ import Login from './src/screens/Login';
 import React from 'react';
 import whyDidYouRender from '@welldone-software/why-did-you-render';
 import SignUp from "./src/screens/SignUp";
+import QueueScreen from "./src/screens/QueueScreen";
+import NotificationScreen from "./src/screens/NotificationScreen";
 
 if (process.env.NODE_ENV === 'development') {
     whyDidYouRender(React, {
@@ -19,6 +21,8 @@ const App: React.FC = () => {
             <Stack.Navigator initialRouteName="Login">
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name={'SignUp'} component={SignUp} />
+                <Stack.Screen name={'Queue'} component={QueueScreen} />
+                <Stack.Screen name={'Notification'} component={NotificationScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );
