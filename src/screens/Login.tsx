@@ -5,7 +5,6 @@ import { useColorScheme } from 'react-native';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import * as Google from 'expo-auth-session/providers/google';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '../config/firebaseConfig';
 
@@ -13,96 +12,17 @@ type Props = {
     navigation: any;
 };
 
-const Login: React.FC<Props> = ({ navigation }) => {
-    const colorScheme = useColorScheme();
-    const isDarkMode = colorScheme === 'dark';
-
-    const [loaded, setLoaded] = useState(false);
-
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-    const formik = useFormik({
-        initialValues: { email: '', password: '' },
-        validationSchema: Yup.object({
-            email: Yup.string().email('Invalid email address').required('Required'),
-            password: Yup.string().required('Required'),
-        }),
-        onSubmit: async (values: { email: string; password: string; }) => {
-            try {
-                await signInWithEmailAndPassword(auth, values.email, values.password);
-                setSuccessMessage('Login bem-sucedido!');
-                setErrorMessage(null);
-            } catch (error) {
-                setErrorMessage((error as any).message);
-                setSuccessMessage(null);
-            }
-        },
-    });
-
-    const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-        clientId: '192591185329-bprc85sjtf2nf10jveo5fr3o1llhffrp.apps.googleusercontent.com',
-    });
-
-    React.useEffect(() => {
-        if (response?.type === 'success') {
-            const { id_token } = response.params;
-            const credential = GoogleAuthProvider.credential(id_token);
-            signInWithCredential(auth, credential);
-        }
-    }, [response]);
-
-    useEffect(() => {
-        setTimeout(() => setLoaded(true), 100);
-    }, []);
-
-    if (!loaded) {
-        return null;
-    }
-
+const AfterSignUp: React.FC<Props> = ({ navigation }) => {
+    
     return (
-        <View style={[styles.container, isDarkMode ? styles.darkMode : styles.lightMode]}>
-            <Image source={require('./../../assets/images/splash.png')} style={styles.logo} />
-            <Input
-                placeholder='E-mail'
-                onChangeText={formik.handleChange('email')}
-                value={formik.values.email}
-                errorMessage={formik.touched.email && formik.errors.email ? formik.errors.email : ''}
-            />
-            <Input
-                placeholder='Senha'
-                secureTextEntry
-                onChangeText={formik.handleChange('password')}
-                value={formik.values.password}
-                errorMessage={formik.touched.password && formik.errors.password ? formik.errors.password : ''}
-            />
-            {successMessage && <Text style={{ color: 'green' }}>{successMessage}</Text>}
-            {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
-            <Button title="Entrar" onPress={() => formik.handleSubmit()} />
-            
-            <Button title="Cadastrar" type="clear" onPress={() => navigation.navigate('SignUp')} />
-
-            {/* Linha e palavra "ou" */}
-            <DividerWithText />
-
-            <Button
-                title="Entrar com Google"
-                icon={<Image source={require('./../../assets/images/splash.png')} style={{ width: 24, height: 24, marginRight: 10 }} />}
-                onPress={() => promptAsync()}
-            />
+        <View style={[styles.container]}>
+            <Text>Cadastro realizado com sucesso</Text>
+            <View style={styles.loginContainer}>
+                <Text style={styles.loginText}>LOGIN</Text>
+            </View>
         </View>
     );
 }
-
-const DividerWithText = () => {
-    return (
-        <View style={styles.dividerContainer}>
-            <Divider style={styles.line} />
-            <Text style={styles.dividerText}>ou</Text>
-            <Divider style={styles.line} />
-        </View>
-    );
-};
 
 const styles = StyleSheet.create({
     container: {
@@ -135,6 +55,18 @@ const styles = StyleSheet.create({
         width: 40,
         textAlign: 'center',
     },
+    loginContainer: {
+        backgroundColor: 'green',
+        borderRadius: 10, // Define as bordas arredondadas
+        padding: 10, // Adiciona espaço interno para o texto
+        marginTop: 10, // Define a margem superior (aumentada para 10)
+    },
+    loginText: {
+        textAlign: 'center',
+        color: 'white', // Cor do texto
+        fontSize: 24, // Aumenta o tamanho do texto para 24 (ou ajuste conforme desejado)
+    },
 });
 
-export default Login;
+export default AfterSignUp;
+    
