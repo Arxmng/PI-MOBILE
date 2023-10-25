@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 const YourScreen: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>TÍTULO GRANDE</Text>
+      <Text style={styles.title}>Registrado com Sucesso!</Text>
       <View style={styles.rectangle}>
         <Text style={styles.loginText}>LOGIN:</Text>
       </View>
