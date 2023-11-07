@@ -3,9 +3,11 @@ import {View, StyleSheet, ScrollView, Text} from 'react-native';
 import {Input, Button} from 'react-native-elements';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { db } from '../config/firebaseConfig';
+import { db, auth } from '../config/firebaseConfig';
 import RNPickerSelect from 'react-native-picker-select';
 import { addDoc, collection } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+
 
 type Props = {
     navigation: any;
@@ -61,10 +63,10 @@ const pickerSelectStyles = StyleSheet.create({
 
 
 
-const SignUp: React.FC<Props> = ({navigation}) => {
+const SignUp: React.FC<Props> = ({ navigation }) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [selectedState, setSelectedState] = useState<string | undefined>(undefined);
-
+    const [selectedState, setSelectedState] = useState<string | undefined>();
+    let senha = 0;
     const formik = useFormik({
         initialValues: {
             fullName: '',
@@ -89,7 +91,12 @@ const SignUp: React.FC<Props> = ({navigation}) => {
             howDidYouKnow: Yup.string(),
         }),
         onSubmit: async (values) => {
-            try {
+
+                senha = Math.round(Math.random() * (999999 - 111111) + 0);
+                createUserWithEmailAndPassword(auth, values.email, senha.toString())
+              .then( async (userCredentials) => {
+              const user = userCredentials.user;
+              try {
                 const docRef = await addDoc(collection(db, "studiogames"), {
                     fullName: values.fullName,
                     email: values.email,
@@ -105,7 +112,17 @@ const SignUp: React.FC<Props> = ({navigation}) => {
                 console.log("Document written with ID: ", docRef.id);
             } catch (e) {
                 console.error("Error adding document: ", e);
-            }
+              }
+              console.log(user.email, senha);
+              navigation.navigate('AfterSignUp');
+            }) .catch ((error) => {
+                //const errorCode = error.code;
+                const errorMessage = error.message;
+                if (errorMessage == "Firebase: Error (auth/email-already-in-use)."){
+                    alert('Email ja registrado')
+                }
+            });
+            //navigation.navigate('Home')
         },
     });
 

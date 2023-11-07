@@ -27,7 +27,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
             email: Yup.string().email('Invalid email address').required('Required'),
             password: Yup.string().required('Required'),
         }),
-        onSubmit: async (values) => {
+        onSubmit: async (values: { email: string; password: string; }) => {
             try {
                 await signInWithEmailAndPassword(auth, values.email, values.password);
                 setSuccessMessage('Login bem-sucedido!');
