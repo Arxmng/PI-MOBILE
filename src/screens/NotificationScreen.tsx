@@ -6,7 +6,7 @@ const NotificationScreen: React.FC = () => {
         <View style={styles.container}>
             <Image
                 style={styles.image}
-                source={require('../assets/notification.png')} // Adicione uma imagem de notificação aqui
+                source={require('../../assets/images/NotificationIcon.png')}
             />
             <Text style={styles.title}>Atenção</Text>
             <Text style={styles.message}>Sua posição na fila chegou, venha até o equipamento.</Text>

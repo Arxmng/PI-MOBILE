@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { db } from '../config/firebaseConfig';
-import { getDocs, collection, doc, onSnapshot } from "firebase/firestore";
-import { useNavigation } from '@react-navigation/native';
+import { getDocs, collection, doc, onSnapshot, DocumentData } from "firebase/firestore";
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 type Queue = {
-    category: string,
-    waitTime: number,
-    usersInQueue: number
-}
+    category: string;
+    waitTime: number;
+    usersInQueue: number;
+};
+
+// If you have a type for your navigation (e.g., RootStackParamList), you can use it here
+// Replace 'RootStackParamList' with the actual name of your navigation param list type
+type NavigationType = NavigationProp<Record<string, object | undefined>>;
 
 const QueueScreen: React.FC = () => {
-    const navigation: any = useNavigation(); // forçando a tipagem para 'any'
+    const navigation = useNavigation<NavigationType>();
     const [queues, setQueues] = useState<Queue[]>([]);
     const [userPosition, setUserPosition] = useState<number | null>(null);
 
@@ -20,26 +24,28 @@ const QueueScreen: React.FC = () => {
             const querySnapshot = await getDocs(collection(db, "queues"));
             const queuesData: Queue[] = [];
             querySnapshot.forEach((doc) => {
-                queuesData.push(doc.data() as Queue);
+                const queueData = doc.data() as Queue;
+                queuesData.push(queueData);
             });
             setQueues(queuesData);
         };
 
         const userDoc = doc(db, "users", "userID");
         const unsubscribe = onSnapshot(userDoc, (doc) => {
-            const userData = doc.data();
-            if (userData && 'position' in userData) {
+            const userData = doc.data() as DocumentData;
+            if (userData && userData.position !== undefined) {
                 setUserPosition(userData.position);
                 if (userData.position === 1) {
-                    navigation.navigate("Notification");
+                    navigation.navigate("Notification"); // Ensure 'Notification' is a valid screen in your navigator
                 }
             }
         });
 
         fetchData();
 
+        // Clean up the onSnapshot listener when the component is unmounted
         return () => unsubscribe();
-    }, []);
+    }, [navigation]);
 
     return (
         <View style={styles.container}>
