@@ -173,21 +173,27 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
                     mask="date"
                     errorMessage={formik.touched.dateOfBirth && formik.errors.dateOfBirth ? formik.errors.dateOfBirth : ''}
                 />
-                <InputMask
-                    placeholder='Telefone'
-                    value={formik.values.phone}
-                    onChange={(e) => formik.setFieldValue('phone', e)}
-                    mask="phone"
-                    errorMessage={formik.touched.phone && formik.errors.phone ? formik.errors.phone : ''}
-                />
-                <InputMask
-                    placeholder='Telefone do Responsável'
-                    value={formik.values.responsiblePhone}
-                    onChange={(e) => formik.setFieldValue('responsiblePhone', e)}
-                    mask="phone"
-                    errorMessage={formik.touched.responsiblePhone && formik.errors.responsiblePhone ? formik.errors.responsiblePhone : ''}
-                />
+                <View style={styles.row}>
+                    <View style={styles.halfWidth}>
+                        <InputMask
+                            placeholder='Telefone'
+                            value={formik.values.phone}
+                            onChange={(e) => formik.setFieldValue('phone', e)}
+                            mask="phone"
+                            errorMessage={formik.touched.phone && formik.errors.phone ? formik.errors.phone : ''}
+                        />
+                    </View>
+                    <View style={styles.halfWidth}>
+                        <InputMask
+                            placeholder='Telefone do Responsável'
+                            value={formik.values.responsiblePhone}
+                            onChange={(e) => formik.setFieldValue('responsiblePhone', e)}
+                            mask="phone"
+                            errorMessage={formik.touched.responsiblePhone && formik.errors.responsiblePhone ? formik.errors.responsiblePhone : ''}
+                        />
+                    </View>
                 </View>
+
 
             <View style={styles.row}>
                 <View style={styles.halfWidth}>
@@ -247,7 +253,7 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
                 <Button title="Voltar para Login" type="clear"
                         onPress={() => navigation.navigate('Login')}/>
 
-
+            </View>
         </ScrollView>
 
     );
