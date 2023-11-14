@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextInput, TextInputProps, Text, View } from 'react-native';
+import { Input } from 'react-native-elements';
 
 type InputMaskProps = {
     value: string;
@@ -54,8 +55,14 @@ const InputMask: React.FC<InputMaskProps> = ({ value, onChange, mask, errorMessa
 
     return (
         <View>
-            <TextInput value={value} onChangeText={handleChange} {...props} />
-            {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
+            <Input
+                value={value}
+                onChangeText={handleChange}
+
+                {...props}
+                errorStyle={{ color: 'red' }}
+                errorMessage={errorMessage}
+            />
         </View>
     );
 };
