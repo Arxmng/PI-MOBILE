@@ -51,7 +51,11 @@ const styles = StyleSheet.create({
     },
 });
 
-
+// Função para gerar o apelido/nick de login
+const generateLoginNickname = (fullName: String) => {
+    const randomChars = Math.random().toString(36).substring(2, 5);
+    return fullName.substring(0, 3) + randomChars;
+};
 
 const SignUp: React.FC<Props> = ({ navigation }) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -104,10 +108,14 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
                 const user = userCredential.user;
                 await updateProfile(user, { displayName: values.fullName });
 
+                const loginNickname = generateLoginNickname(values.fullName);
+
                 try {
                     await addDoc(collection(db, "users"), {
                         uid: user.uid,
                         fullName: values.fullName,
+                        loginNickname: loginNickname,
+                        activated: false,
                         email: values.email,
                         cpf: values.cpf,
                         dateOfBirth: dateOfBirthObj, // Use the converted Date object
@@ -117,7 +125,7 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
                         state: values.state,
                         howDidYouKnow: values.howDidYouKnow,
                     });
-                    navigation.navigate('AfterSignUp');
+                    navigation.navigate('AfterSignUp', { loginNickname: loginNickname });
                 } catch (e) {
                     if (e instanceof Error) {
                         setErrorMessage(e.message);

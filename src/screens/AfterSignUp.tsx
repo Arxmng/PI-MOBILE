@@ -1,57 +1,48 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
-import {Input, Button, Divider} from 'react-native-elements';
-import {useColorScheme} from 'react-native';
-import {useFormik} from 'formik';
-import * as Yup from 'yup';
-import * as Google from 'expo-auth-session/providers/google';
-import {signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential} from 'firebase/auth';
-import {auth} from '../config/firebaseConfig';
+import React from 'react';
+import { View, Text, StyleSheet, Button } from 'react-native';
 
 type Props = {
+    route: any;
     navigation: any;
 };
 
-const AfterSignUp: React.FC<Props> = ({navigation}) => {
+const AfterSignUp: React.FC<Props> = ({ route, navigation }) => {
+    const { loginNickname } = route.params;
 
     return (
-        <View style={[styles.container]}>
-            <Text>Cadastro realizado com sucesso</Text>
-
+        <View style={styles.container}>
+            <Text style={styles.successMessage}>Cadastro Realizado com Sucesso!</Text>
+            <Text style={styles.nickname}>Seu nickname: {loginNickname}</Text>
+            <Text style={styles.instruction}>
+                Solicite a ajuda de um de nossos atendentes para a ativação do seu cadastro.
+            </Text>
+            <Button title="Voltar para Login" onPress={() => navigation.navigate('Login')} />
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        padding: 20,
-    },
-    logo: {
-        alignSelf: 'center',
-        marginBottom: 20,
-        height: 100,
-        width: 100,
-    },
-    lightMode: {
-        backgroundColor: 'white',
-    },
-    darkMode: {
-        backgroundColor: 'black',
-    },
-    dividerContainer: {
-        flexDirection: 'row',
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        marginVertical: 10,
+        padding: 20,
+        paddingTop: 60,
     },
-    line: {
-        flex: 1,
-        height: 2,
+    successMessage: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 30,
     },
-    dividerText: {
-        width: 40,
+    nickname: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 30,
+    },
+    instruction: {
+        fontSize: 18,
         textAlign: 'center',
+        marginBottom: 40,
     },
 });
 
