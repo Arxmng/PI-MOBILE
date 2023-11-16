@@ -8,6 +8,8 @@ import * as Google from 'expo-auth-session/providers/google';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '../config/firebaseConfig';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import {collection, getDocs, getFirestore, query, where} from "firebase/firestore";
 
 type Props = {
     navigation: any;
@@ -20,6 +22,55 @@ const Login: React.FC<Props> = ({ navigation }) => {
     const [loaded, setLoaded] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [showResetPassword, setShowResetPassword] = useState(false);
+
+    const handleResetPassword = async () => {
+        const email = formik.values.email;
+        if (email) {
+            try {
+                await sendPasswordResetEmail(auth, email);
+                setSuccessMessage('Email de redefinição de senha enviado.');
+            } catch (error) {
+                setErrorMessage('Erro ao enviar email de redefinição.');
+            }
+        } else {
+            setErrorMessage('Por favor, insira seu email.');
+        }
+    };
+
+    const onSubmit = async (values: { email: string; password: string; }) => {
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+            const userUid = userCredential.user.uid;
+            const db = getFirestore();
+
+
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where('uid', '==', userUid));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const userData = querySnapshot.docs[0].data();
+                if (userData.activated) {
+                    setSuccessMessage('Login bem-sucedido!');
+                    setErrorMessage(null);
+                    setShowResetPassword(false);
+                    navigation.navigate('Queue');
+
+                } else {
+                    setErrorMessage('Acesso negado. Conta não ativada.');
+                    auth.signOut();
+                }
+            } else {
+                setErrorMessage('Usuário não encontrado no sistema.');
+                auth.signOut();
+            }
+        } catch (error) {
+            setErrorMessage((error as any).message);
+            setSuccessMessage(null);
+            setShowResetPassword(true);
+        }
+    };
 
     const formik = useFormik({
         initialValues: { email: '', password: '' },
@@ -27,17 +78,9 @@ const Login: React.FC<Props> = ({ navigation }) => {
             email: Yup.string().email('Invalid email address').required('Required'),
             password: Yup.string().required('Required'),
         }),
-        onSubmit: async (values: { email: string; password: string; }) => {
-            try {
-                await signInWithEmailAndPassword(auth, values.email, values.password);
-                setSuccessMessage('Login bem-sucedido!');
-                setErrorMessage(null);
-            } catch (error) {
-                setErrorMessage((error as any).message);
-                setSuccessMessage(null);
-            }
-        },
+        onSubmit,
     });
+
 
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
         clientId: '192591185329-bprc85sjtf2nf10jveo5fr3o1llhffrp.apps.googleusercontent.com',
@@ -76,10 +119,24 @@ const Login: React.FC<Props> = ({ navigation }) => {
                 errorMessage={formik.touched.password && formik.errors.password ? formik.errors.password : ''}
             />
             {successMessage && <Text style={{ color: 'green' }}>{successMessage}</Text>}
-            {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
+            {errorMessage && <Text style={{ color: 'red' }}>{Array.isArray(errorMessage) ? errorMessage.join(' ') : errorMessage}</Text>}
             <Button title="Entrar" onPress={() => formik.handleSubmit()} />
-            
-            <Button title="Cadastrar" type="clear" onPress={() => navigation.navigate('SignUp')} />
+
+            <View style={[styles.footerButtons, showResetPassword ? null : styles.centerButton]}>
+                {showResetPassword && (
+                    <Button
+                        title="Esqueci a senha"
+                        type="clear"
+                        onPress={handleResetPassword}
+                    />
+                )}
+                <Button
+                    title="Cadastrar"
+                    type="clear"
+                    onPress={() => navigation.navigate('SignUp')}
+                />
+            </View>
+
 
             {/* Linha e palavra "ou" */}
             <DividerWithText />
@@ -133,6 +190,14 @@ const styles = StyleSheet.create({
     dividerText: {
         width: 40,
         textAlign: 'center',
+    },
+    footerButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+    },
+    centerButton: {
+        justifyContent: 'center',
     },
 });
 

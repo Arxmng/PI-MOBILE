@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, Button } from 'react-native';
 import { db } from '../config/firebaseConfig';
 import { getDocs, collection, doc, onSnapshot, DocumentData } from "firebase/firestore";
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { getFirestore, query, where } from 'firebase/firestore';
+
 
 type Queue = {
     category: string;
