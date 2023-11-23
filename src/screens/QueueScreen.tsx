@@ -63,10 +63,13 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
     };
 
     const calculateFutureTimes = (queue: UserInQueue[]): UserInQueue[] => {
+        let accumulatedWaitTime = 0;
+
         return queue.map(user => {
-            let createdAtDate = firestoreTimestampToDate(user.createdAt);
             let waitTimeMinutes = timeToMinutes(user.waitTime);
-            return { ...user, futureTime: new Date(createdAtDate.getTime() + waitTimeMinutes * 60000) };
+            let futureTime = new Date(serverTime.getTime() + accumulatedWaitTime * 60000);
+            accumulatedWaitTime += waitTimeMinutes; // Accumulate wait time for the next user
+            return { ...user, futureTime };
         });
     };
 
@@ -126,8 +129,13 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
 
 
     useEffect(() => {
-        fetchQueue();
-    }, [selectedCategory]);
+        // Set an interval to periodically refresh the queue
+        const interval = setInterval(() => {
+            fetchQueue();
+        }, 10000); // ajuste se quiser mais rapido para o refresh da tela
+
+        return () => clearInterval(interval);
+    }, [selectedCategory, serverTime]); // Add serverTime as a dependency
 
 
 
