@@ -150,12 +150,21 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
     // Fetch queue and user's nickname
     useEffect(() => {
         const fetchUserName = async () => {
-            // ... logic to fetch user's nickname ...
+            if (auth.currentUser) {
+                const userId = auth.currentUser.uid;
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("uid", "==", userId));
+                const querySnapshot = await getDocs(q);
+
+                querySnapshot.forEach((doc) => {
+                    if (doc.data().fullName) {
+                        setCurrentUserNickname(doc.data().fullName);
+                    }
+                });
+            }
         };
 
-        if (auth.currentUser) {
-            fetchUserName();
-        }
+        fetchUserName();
         fetchQueue();
     }, [selectedCategory, serverTime]); // Depend on serverTime to re-fetch the queue
 
