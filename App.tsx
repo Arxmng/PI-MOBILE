@@ -21,10 +21,10 @@ const App: React.FC = () => {
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Login">
                 <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name={'SignUp'} component={SignUp} />
-                <Stack.Screen name={'Queue'} component={QueueScreen} />
+                <Stack.Screen name={'Cadastro'} component={SignUp} />
+                <Stack.Screen name={'Fila'} component={QueueScreen} />
                 <Stack.Screen name={'Notification'} component={NotificationScreen} />
-                <Stack.Screen name={ 'AfterSignUp' } component={ AfterSignUp } />
+                <Stack.Screen name={'Confirmation'} component={ AfterSignUp } />
             </Stack.Navigator>
         </NavigationContainer>
     );

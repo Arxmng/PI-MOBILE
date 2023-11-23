@@ -20,8 +20,8 @@ const pickerSelectStyles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderWidth: 1,
-        borderColor: '#ccc', // Adjust this
-        borderRadius: 5, // Adjust this
+        borderColor: '#ccc',
+        borderRadius: 5,
         color: 'black',
     },
     inputAndroid: {
@@ -29,8 +29,8 @@ const pickerSelectStyles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 8,
         borderWidth: 1,
-        borderColor: '#ccc', // Adjust this
-        borderRadius: 5, // Adjust this
+        borderColor: '#ccc',
+        borderRadius: 5,
         color: 'black',
     },
 });
@@ -125,7 +125,7 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
                         state: values.state,
                         howDidYouKnow: values.howDidYouKnow,
                     });
-                    navigation.navigate('AfterSignUp', { loginNickname: loginNickname });
+                    navigation.navigate('Confirmation', { loginNickname: loginNickname });
                 } catch (e) {
                     if (e instanceof Error) {
                         setErrorMessage(e.message);

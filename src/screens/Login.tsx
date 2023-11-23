@@ -55,7 +55,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
                     setSuccessMessage('Login bem-sucedido!');
                     setErrorMessage(null);
                     setShowResetPassword(false);
-                    navigation.navigate('Queue');
+                    navigation.navigate('Fila');
 
                 } else {
                     setErrorMessage('Acesso negado. Conta não ativada.');
@@ -133,12 +133,11 @@ const Login: React.FC<Props> = ({ navigation }) => {
                 <Button
                     title="Cadastrar"
                     type="clear"
-                    onPress={() => navigation.navigate('SignUp')}
+                    onPress={() => navigation.navigate('Cadastro')}
                 />
             </View>
 
 
-            {/* Linha e palavra "ou" */}
             <DividerWithText />
 
             <Button
