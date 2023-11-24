@@ -41,7 +41,6 @@ const applyMask = (value: string, mask: 'cpf' | 'phone' | 'date' | 'text' | 'ema
 };
 
 const validateInput = (value: string, mask: 'cpf' | 'phone' | 'date' | 'text' | 'email' | 'password'): string => {
-    // Você pode adicionar validações específicas se necessário
     return value;
 };
 
