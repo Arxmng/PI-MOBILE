@@ -1,8 +1,28 @@
+/**
+ * QueueScreen Component for a Gaming Queue Management System
+ *
+ * Este componente React faz parte de um sistema de gerenciamento de filas para uma área de jogos em um shopping center. O sistema é projetado para ser descentralizado e independente de funções do lado do servidor, ideal para o uso com o plano gratuito do Firebase/Firestore, que não suporta funções de nuvem.
+ *
+ * Principais Características:
+ * 1. Descentralização: A lógica de controle da fila é gerenciada pelo próprio cliente, em vez de depender de um servidor ou funções de nuvem. Isso aumenta a redundância e reduz a dependência de um único ponto de falha.
+ *
+ * 2. Cálculo Dinâmico do Tempo de Espera: O 'futureTime' de cada usuário na fila é calculado dinamicamente com base no tempo atual do servidor e no tempo de espera acumulado dos usuários anteriores na fila. Isso garante que o primeiro usuário comece imediatamente, e os tempos de espera sejam gerenciados de forma eficiente para os demais usuários.
+ *
+ * 3. Atualização e Remoção Automática: Usuários cujo 'futureTime' já passou são automaticamente removidos da fila local e do Firestore, garantindo que a fila esteja sempre atualizada.
+ *
+ * 4. Notificação ao Usuário: O usuário é notificado quando chega a sua vez de jogar, baseado em sua posição na fila e no tempo de espera.
+ *
+ * 5. Tempo de Servidor Confiável: Para evitar manipulações, como mudanças no tempo do dispositivo pelo usuário (cheating), o componente busca o horário atual do servidor de um serviço externo (worldtimeapi.org), garantindo que todos os usuários tenham um ponto de referência de tempo consistente e confiável.
+ *
+ * Este sistema é uma solução eficaz e econômica para a gestão de filas, especialmente útil em ambientes onde não é possível implementar lógica de servidor complexa, ou para economizar com custos de cloud computing.
+ */
+
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import {getFirestore, collection, query, where, getDocs, orderBy, Timestamp, doc, deleteDoc} from "firebase/firestore";
 import { auth } from "../config/firebaseConfig";
+import {signOut} from "@firebase/auth";
 
 interface QueueScreenProps {
     navigation: any;
@@ -24,9 +44,19 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
     const [totalWaitTime, setTotalWaitTime] = useState<number>(0);
     const [currentUserNickname, setCurrentUserNickname] = useState<string>("");
     const [serverTime, setServerTime] = useState(new Date());
+    const [currentUserUID, setCurrentUserUID] = useState<string>("");
+    const [userPosition, setUserPosition] = useState<number | null>(null);
 
     const db = getFirestore();
 
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error('Erro ao sair:', error);
+        }
+    };
     const removeUserFromFirestore = async (firestoreDocId: string) => {
         const queueRef = collection(db, "queues");
         try {
@@ -63,13 +93,20 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
     };
 
     const calculateFutureTimes = (queue: UserInQueue[]): UserInQueue[] => {
-        let accumulatedWaitTime = 0;
+        let accumulatedWaitTimeInMinutes = 0;
 
-        return queue.map(user => {
+        return queue.map((user, index) => {
             let waitTimeMinutes = timeToMinutes(user.waitTime);
-            let futureTime = new Date(serverTime.getTime() + accumulatedWaitTime * 60000);
-            accumulatedWaitTime += waitTimeMinutes; // Accumulate wait time for the next user
-            return { ...user, futureTime };
+
+            if (index === 0) {
+                // Para o primeiro usuário, o futureTime é o tempo atual do servidor
+                return { ...user, futureTime: new Date(serverTime.getTime()) };
+            } else {
+                // Para os usuários subsequentes, acumula o tempo de espera
+                accumulatedWaitTimeInMinutes += waitTimeMinutes;
+                let futureTime = new Date(serverTime.getTime() + accumulatedWaitTimeInMinutes * 60000);
+                return { ...user, futureTime };
+            }
         });
     };
 
@@ -101,14 +138,42 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
             firestoreDocId: doc.id
         }));
 
+            const notifyUser = (message: string) => {
+                alert(message);
+            };
+
+        const notifyUserIfItsTheirTurn = () => {
+            const currentUserInQueue = queue.find(user => user.loginNickname === currentUserNickname && user.docId === currentUserUID);
+
+            if (currentUserInQueue) {
+                const isCurrentUserTurn = currentUserInQueue.futureTime && new Date() >= currentUserInQueue.futureTime;
+                if (isCurrentUserTurn) {
+                    notifyUser("Sua vez de jogar!");
+                }
+            }
+        };
+
         newQueue = calculateFutureTimes(newQueue);
         newQueue = await removeElapsedUsers(newQueue);
+
+        setQueue(newQueue);
+        notifyUserIfItsTheirTurn();
+
 
         let calculatedTotalWaitTime = 0;
         let calculatedPeopleAhead = 0;
         let currentUserInLine = false;
 
-        // Iterate over the queue to calculate the total wait time and number of people ahead
+        newQueue.forEach((user, index) => {
+            if (user.loginNickname === currentUserNickname && user.docId === currentUserUID) {
+                if (index === 0 && user.futureTime && user.futureTime <= new Date()) {
+                    notifyUser("Sua vez de jogar!");
+                } else if (index !== 0) {
+                    notifyUser("Está quase na sua vez de jogar!");
+                }
+            }
+        });
+
         newQueue.forEach((user: UserInQueue) => {
             if (user.loginNickname === currentUserNickname) {
                 currentUserInLine = true;
@@ -129,13 +194,17 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
 
 
     useEffect(() => {
-        // Set an interval to periodically refresh the queue
+
+        if (auth.currentUser) {
+            setCurrentUserUID(auth.currentUser.uid);
+        }
+
         const interval = setInterval(() => {
             fetchQueue();
-        }, 10000); // ajuste se quiser mais rapido para o refresh da tela
+        }, 10000); // Irá atualizar a fila a cada 10 segundos
 
         return () => clearInterval(interval);
-    }, [selectedCategory, serverTime]); // Add serverTime as a dependency
+    }, [selectedCategory, serverTime]);
 
 
 
@@ -144,6 +213,7 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
         const [hours, minutes] = time.split(':').map(Number);
         return hours * 60 + minutes;
     };
+
 
     useEffect(() => {
         const initServerTime = async () => {
@@ -155,7 +225,6 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
         initServerTime();
     }, [selectedCategory]); // Fetch server time only when selectedCategory changes
 
-    // Fetch queue and user's nickname
     useEffect(() => {
         const fetchUserName = async () => {
             if (auth.currentUser) {
@@ -205,7 +274,7 @@ const QueueScreen = ({ navigation }: QueueScreenProps) => {
                 ))}
             </View>
             <View style={styles.logoutButtonContainer}>
-                <Button title="Logout" onPress={() => {/* Logica do logout - fazer */}} />
+                <Button title="Logout" onPress={handleLogout} />
             </View>
         </View>
 
